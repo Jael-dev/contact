@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+import jsPDF from 'jspdf';
 import AddContact from './AddContact.vue';
 import ImportButton from './ImportButton.vue';
 
@@ -10,18 +11,35 @@ const handleClick = () => {
 };
 
 const openGithubRepo = () => {
-  const githubRepoUrl = "https://github.com/yourusername/yourrepo";
-  
-  // Open the GitHub repo link in a new tab
+  const githubRepoUrl = "https://github.com/Jael-dev/contact";
   window.open(githubRepoUrl, "_blank");
 };
 
 const openLinkedinProfile = () => {
-  // Replace "https://github.com/yourusername/yourrepo" with your GitHub repository URL
-  const githubRepoUrl = "https://github.com/yourusername/yourrepo";
-  
-  // Open the GitHub repo link in a new tab
+  const githubRepoUrl = "https://www.linkedin.com/in/ja%C3%ABl-ngouzong-bbb587204/"; 
   window.open(githubRepoUrl, "_blank");
+};
+
+
+const downloadPDF = () => {
+  // Replace jsonData with your actual JSON data
+  const jsonData = [
+    { name: 'Item 1', value: '100' },
+    { name: 'Item 2', value: '200' },
+    // Add more items as needed
+  ];
+
+  // Create a new jsPDF instance
+  const pdf = new jsPDF();
+
+  // Set up PDF content
+  pdf.text('My JSON Data as PDF', 20, 10);
+  jsonData.forEach((item, index) => {
+    pdf.text(`${index + 1}. ${item.name}: ${item.value}`, 20, 20 + index * 10);
+  });
+
+  // Save the PDF
+  pdf.save('my-contact-list.pdf');
 };
 </script>
 
@@ -54,15 +72,15 @@ const openLinkedinProfile = () => {
                 <div class="pa-2">
                     <v-row align="center" justify="center">
                         <v-col cols="auto">
-                            <v-btn density="compact" icon="mdi-cloud-upload"></v-btn>
+                            <v-btn density="compact" icon="mdi-cloud-upload" @click="downloadPDF"></v-btn>
                         </v-col>
 
                         <v-col cols="auto">
-                            <v-btn density="compact" icon="mdi-github"></v-btn>
+                            <v-btn density="compact" icon="mdi-github" @click="openGithubRepo"></v-btn>
                         </v-col>
 
                         <v-col cols="auto">
-                            <v-btn density="compact" icon="mdi-linkedin"></v-btn>
+                            <v-btn density="compact" icon="mdi-linkedin" @click="openLinkedinProfile"></v-btn>
                         </v-col>
                     </v-row>
                 </div>
