@@ -1,45 +1,38 @@
 <script setup>
-import { ref } from 'vue';
 import jsPDF from 'jspdf';
 import AddContact from './AddContact.vue';
-import ImportButton from './ImportButton.vue';
-
-const isClicked = ref(false);
-
-const handleClick = () => {
-    isClicked.value = !isClicked.value;
-};
+import MyButton from './MyButton.vue';
 
 const openGithubRepo = () => {
-  const githubRepoUrl = "https://github.com/Jael-dev/contact";
-  window.open(githubRepoUrl, "_blank");
+    const githubRepoUrl = "https://github.com/Jael-dev/contact";
+    window.open(githubRepoUrl, "_blank");
 };
 
 const openLinkedinProfile = () => {
-  const githubRepoUrl = "https://www.linkedin.com/in/ja%C3%ABl-ngouzong-bbb587204/"; 
-  window.open(githubRepoUrl, "_blank");
+    const githubRepoUrl = "https://www.linkedin.com/in/ja%C3%ABl-ngouzong-bbb587204/";
+    window.open(githubRepoUrl, "_blank");
 };
 
 
 const downloadPDF = () => {
-  // Replace jsonData with your actual JSON data
-  const jsonData = [
-    { name: 'Item 1', value: '100' },
-    { name: 'Item 2', value: '200' },
-    // Add more items as needed
-  ];
+    // Replace jsonData with your actual JSON data
+    const jsonData = [
+        { name: 'Item 1', value: '100' },
+        { name: 'Item 2', value: '200' },
+        // Add more items as needed
+    ];
 
-  // Create a new jsPDF instance
-  const pdf = new jsPDF();
+    // Create a new jsPDF instance
+    const pdf = new jsPDF();
 
-  // Set up PDF content
-  pdf.text('My JSON Data as PDF', 20, 10);
-  jsonData.forEach((item, index) => {
-    pdf.text(`${index + 1}. ${item.name}: ${item.value}`, 20, 20 + index * 10);
-  });
+    // Set up PDF content
+    pdf.text('My JSON Data as PDF', 20, 10);
+    jsonData.forEach((item, index) => {
+        pdf.text(`${index + 1}. ${item.name}: ${item.value}`, 20, 20 + index * 10);
+    });
 
-  // Save the PDF
-  pdf.save('my-contact-list.pdf');
+    // Save the PDF
+    pdf.save('my-contact-list.pdf');
 };
 </script>
 
@@ -47,21 +40,20 @@ const downloadPDF = () => {
     <v-card>
         <v-navigation-drawer class="bg-primary" permanent>
             <v-list color="transparent">
-                <div class="add-contact my-4">
+                <div class="add-contact my-8">
                     <AddContact />
                 </div>
-                <v-list-item class="ml-4">
+                <v-list-item class="ml-6">
                     <v-list>
 
-                        <v-btn variant="plain">
-                            All contacts
+                        <v-btn variant="plain" style="text-transform: none;" class="font-weight-thin" :ripple="false">
+                            All Contacts
                         </v-btn>
-                        <v-container>
-                            <!-- Replace the placeholder image URL with your actual image URL -->
-                            <v-avatar :class="{ 'border-clicked': isClicked }" @click="handleClick">
-                                <img src="https://picsum.photos/350/165?random" alt="Profile Picture">
-                            </v-avatar>
-                        </v-container>
+
+                        <div v-for="index in 6" :key="index">
+                            <MyButton :id="'button-id-' + index" :buttonText="'Button ' + index"></MyButton>
+                        </div>
+
                     </v-list>
 
                 </v-list-item>
@@ -72,15 +64,16 @@ const downloadPDF = () => {
                 <div class="pa-2">
                     <v-row align="center" justify="center">
                         <v-col cols="auto">
-                            <v-btn density="compact" icon="mdi-cloud-upload" @click="downloadPDF"></v-btn>
+                            <v-btn density="compact" icon="mdi-cloud-upload" color="primary" @click="downloadPDF"></v-btn>
                         </v-col>
 
                         <v-col cols="auto">
-                            <v-btn density="compact" icon="mdi-github" @click="openGithubRepo"></v-btn>
+                            <v-btn density="compact" icon="mdi-github" color="primary" @click="openGithubRepo"></v-btn>
                         </v-col>
 
                         <v-col cols="auto">
-                            <v-btn density="compact" icon="mdi-linkedin" @click="openLinkedinProfile"></v-btn>
+                            <v-btn density="compact" icon="mdi-linkedin" color="primary"
+                                @click="openLinkedinProfile"></v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -120,6 +113,4 @@ const downloadPDF = () => {
     align-items: center;
     height: 100%;
 }
-
-
 </style>
