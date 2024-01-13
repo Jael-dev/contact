@@ -99,13 +99,7 @@ const fetchData = async() => {
 // Fetch data when the component is mounted
 onMounted(fetchData);
 
-// // Poll every 5 seconds (5000 milliseconds)
-// const pollInterval = setInterval(fetchData, 5000);
 
-// // Clean up when the component is unmounted
-// onUnmounted(() => {
-//   clearInterval(pollInterval);
-// });
 
 </script>
 

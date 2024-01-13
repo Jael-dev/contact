@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useField, useForm } from 'vee-validate';
-
+import axios from 'axios';
 const { handleSubmit, handleReset } = useForm({
     // your validationSchema
 });
@@ -33,22 +33,47 @@ const addAdditionalField = () => {
     additionalFields.value.push({ key: '', value: '' });
 };
 
-const submit = handleSubmit(values => {
+const submit = handleSubmit(async values => {
     const contactObject = {
-        profile: values.profile,
-        firstName: values.firstName,
-        lastName: values.lastName,
-        phoneNumber: values.phoneNumber,
-        email: values.email,
-        birthdate: values.birthdate,
-        group: values.group,
-        isFavourite: values.isFavourite,
+        "photo": values.profile,
+        "firstName": values.firstName,
+        "lastName": values.lastName,
+        "phoneNumber": values.phoneNumber,
+        "email": values.email,
+        "birthdate": values.birthdate,
+        "group": values.group,
+        "isFavorite": false,
+        "groupId": null,
+        "additionalFields": [],
     };
 
     const additionalObjects = additionalFields.value.map((field, index) => ({
         key: field.key,
         value: field.value,
     }));
+
+    try {
+    const response = await axios.post('http://127.0.0.1:8000/contact/', {
+        "photo": null,
+        "firstName": firstName,
+        "lastName": lastName,
+        "phoneNumber": phoneNumber,
+        "email": email,
+        "birthdate": "2021-10-12",
+        "group": 1,
+        "isFavorite": false,
+        "groupId": null,
+        "additionalFields": [],
+    });
+
+    // Handle the response
+    console.log('Response:', response.data);
+
+    // You can also perform further actions based on the response
+  } catch (error) {
+    // Handle errors
+    console.error('Error:', error.message);
+  }
 
     console.log('Contact Object:', contactObject);
     console.log('Additional Objects:', additionalObjects);
