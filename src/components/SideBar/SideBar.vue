@@ -1,9 +1,30 @@
 <script setup>
-import jsPDF from 'jspdf';
 import AddContact from './AddContact.vue';
 import MyButton from './MyButton.vue';
 import axios from 'axios';
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted , defineEmits  } from 'vue';
+
+const overlay = ref(false);
+
+const groupData = ref([]);
+const groupNames = ref([]);
+const selectedGroup = ref([]);
+
+const emits = defineEmits();
+
+const handleGroupClick = async(group) => {
+    try {
+    const response = await axios.get(`http://127.0.0.1:8000/contact/group/${group}`);
+    selectedGroup.value = response.data;
+
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+
+    // console.log(selectedGroup.value);
+    // Emit a custom event to notify the parent component
+    emits('groupClicked', selectedGroup);
+  };
 
 const openGithubRepo = () => {
     const githubRepoUrl = "https://github.com/Jael-dev/contact";
@@ -27,9 +48,13 @@ const downloadPDF = async() => {
     console.error('Error fetching data:', error);
   }
 
-  console.log(apiData.value);
+   // Dowload the csv file
+    convertJsonToCsv(apiData.value);
 
-  const convertJsonToCsv = (jsonArray) => {
+};
+
+
+const convertJsonToCsv = (jsonArray) => {
   const csvContent = [];
   
   // Add header
@@ -59,10 +84,29 @@ const downloadPDF = async() => {
   // Remove the link from the body
   document.body.removeChild(downloadLink);
 };
-   // Dowload the csv file
-    convertJsonToCsv(apiData.value);
 
-};
+const fetchData = async() => {
+    try {
+    const response = await axios.get('http://127.0.0.1:8000/group');
+    groupData.value = response.data;
+
+    groupNames.value = groupData.value.map(group => group.name);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+
+// Fetch data when the component is mounted
+onMounted(fetchData);
+
+// // Poll every 5 seconds (5000 milliseconds)
+// const pollInterval = setInterval(fetchData, 5000);
+
+// // Clean up when the component is unmounted
+// onUnmounted(() => {
+//   clearInterval(pollInterval);
+// });
+
 </script>
 
 <template>
@@ -79,8 +123,8 @@ const downloadPDF = async() => {
                             All Contacts
                         </v-btn>
 
-                        <div v-for="index in 6" :key="index">
-                            <MyButton :id="'button-id-' + index" :buttonText="'Button ' + index"></MyButton>
+                        <div v-for="(name, index) in groupNames" :key="index" :click="handleGroupClick(index)">
+                            <MyButton :id= index :buttonText=name ></MyButton>
                         </div>
 
                     </v-list>

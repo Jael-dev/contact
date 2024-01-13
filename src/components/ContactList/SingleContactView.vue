@@ -28,21 +28,20 @@ const handleClick = () => {
     <v-list-item >
         <template v-slot:prepend>
           <v-avatar :class="{ 'avatar-clicked': isClicked }">
-            <img :src="item.prependAvatar" alt="Avatar">
+            <img src="https://randomuser.me/api/portraits/women/85.jpg" alt="Avatar">
           </v-avatar>
         </template>
 
         <v-list-item-title :class="{ 'title-clicked': isClicked }">
             <v-row no-gutters>
                 <v-col >
-                    {{ item.title }}
+                    {{ item.firstName }}
                 </v-col>  
                 <v-col class="font-weight-thin">
-                    {{ item.title }}
+                    {{ item.lastName  }}
                 </v-col>      
             </v-row>
             </v-list-item-title>
-        <v-list-item-subtitle v-html="item.subtitle"></v-list-item-subtitle>
   
     </v-list-item></v-card>
    

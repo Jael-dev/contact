@@ -1,35 +1,44 @@
 
 <script setup>
-import { ref } from 'vue';
+import { ref , watch, defineProps, onMounted} from 'vue';
+import axios from 'axios';
 import SingleContactViewVue from './SingleContactView.vue';
 const drawer = ref(false);
-const items = [
-  {
-    prependAvatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
-    title: 'Brunch this weekend?',
-    subtitle: `<span class="text-primary">Ali Connors</span> &mdash; I'll be in your neighborhood doing errands this weekend. Do you want to hang out?`,
-  },
-  {
-    prependAvatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
-    title: 'Summer BBQ',
-    subtitle: `<span class="text-primary">to Alex, Scott, Jennifer</span> &mdash; Wish I could come, but I'm out of town this weekend.`,
-  },
-  {
-    prependAvatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
-    title: 'Oui oui',
-    subtitle: '<span class="text-primary">Sandra Adams</span> &mdash; Do you have Paris recommendations? Have you ever been?',
-  },
-  {
-    prependAvatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
-    title: 'Birthday gift',
-    subtitle: '<span class="text-primary">Trevor Hansen</span> &mdash; Have any ideas about what we should get Heidi for her birthday?',
-  },
-  {
-    prependAvatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
-    title: 'Recipe to try',
-    subtitle: '<span class="text-primary">Britta Holt</span> &mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos.',
-  },
-];
+const  props  = defineProps(['selectedGroup', 'groupUsers']);
+const filteredGroupUsers = ref([]);
+
+const groupData = ref([]);
+const groupNames = ref([]);
+const selectedGroup = ref([]);
+const groupUsers = ref([]);
+
+  const fetchData = async() => {
+    try {
+    const response = await axios.get('http://127.0.0.1:8000/group');
+    groupData.value = response.data;
+    const contacts = await axios.get('http://127.0.0.1:8000/contact');
+    selectedGroup.value = contacts.data;
+    groupUsers.value = contacts.data;
+    groupNames.value = groupData.value.map(group => group.name);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+onMounted(fetchData);
+
+console.log(props.groupUsers);
+
+  // Watch for changes in the selectedGroup and filter the contacts accordingly
+  watch(() => props.selectedGroup.value, (newGroup) => {
+    if (newGroup) {
+      filteredGroupUsers.value = props.groupUsers.filter(user => user.group === newGroup);
+    } else {
+      // If no group is selected, show all contacts
+      filteredGroupUsers.value = props.groupUsers.value;
+    }
+  });
+
+
 </script>
 
 <template>
@@ -41,9 +50,9 @@ const items = [
 
         <v-container class="contact-list">
           
-          <v-row v-for="(item, index) in items" :key="index">
-            <SingleContactViewVue :item="item"  @update:drawer="drawer"></SingleContactViewVue >
-          </v-row>
+          <v-row v-for="(item, index) in groupData" :key="index">
+          <SingleContactViewVue :item="item" @update:drawer="drawer" />
+        </v-row>
         </v-container>
     </v-main>
   </v-layout>
