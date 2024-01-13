@@ -2,6 +2,8 @@
 import jsPDF from 'jspdf';
 import AddContact from './AddContact.vue';
 import MyButton from './MyButton.vue';
+import axios from 'axios';
+import { ref } from 'vue';
 
 const openGithubRepo = () => {
     const githubRepoUrl = "https://github.com/Jael-dev/contact";
@@ -13,26 +15,53 @@ const openLinkedinProfile = () => {
     window.open(githubRepoUrl, "_blank");
 };
 
+// Get data from API
+const downloadPDF = async() => {
 
-const downloadPDF = () => {
-    // Replace jsonData with your actual JSON data
-    const jsonData = [
-        { name: 'Item 1', value: '100' },
-        { name: 'Item 2', value: '200' },
-        // Add more items as needed
-    ];
+    const apiData = ref([]);
 
-    // Create a new jsPDF instance
-    const pdf = new jsPDF();
+    try {
+    const response = await axios.get('http://127.0.0.1:8000/contact');
+    apiData.value = response.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
 
-    // Set up PDF content
-    pdf.text('My JSON Data as PDF', 20, 10);
-    jsonData.forEach((item, index) => {
-        pdf.text(`${index + 1}. ${item.name}: ${item.value}`, 20, 20 + index * 10);
-    });
+  console.log(apiData.value);
 
-    // Save the PDF
-    pdf.save('my-contact-list.pdf');
+  const convertJsonToCsv = (jsonArray) => {
+  const csvContent = [];
+  
+  // Add header
+  const header = Object.keys(jsonArray[0]);
+  csvContent.push(header.join(','));
+
+  // Add rows
+  jsonArray.forEach(item => {
+    const row = Object.values(item);
+    csvContent.push(row.join(','));
+  });
+
+  // Convert to a Blob
+  const csvBlob = new Blob([csvContent.join('\n')], { type: 'text/csv' });
+
+  // Create a download link
+  const downloadLink = document.createElement('a');
+  downloadLink.href = URL.createObjectURL(csvBlob);
+  downloadLink.download = 'data.csv';
+
+  // Append the link to the body
+  document.body.appendChild(downloadLink);
+
+  // Trigger the click event
+  downloadLink.click();
+
+  // Remove the link from the body
+  document.body.removeChild(downloadLink);
+};
+   // Dowload the csv file
+    convertJsonToCsv(apiData.value);
+
 };
 </script>
 

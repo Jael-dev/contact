@@ -2,7 +2,7 @@
 <script setup>
 import { ref } from 'vue';
 import SingleContactViewVue from './SingleContactView.vue';
-const drawer = ref(null);
+const drawer = ref(false);
 const items = [
   {
     prependAvatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
@@ -39,19 +39,25 @@ const items = [
     </v-navigation-drawer>
     <v-main>
 
-      <v-layout>
-        <v-container>
+        <v-container class="contact-list">
           
           <v-row v-for="(item, index) in items" :key="index">
-            <SingleContactViewVue :item="item"></SingleContactViewVue>
+            <SingleContactViewVue :item="item"  @update:drawer="drawer"></SingleContactViewVue >
           </v-row>
         </v-container>
-      </v-layout>
-      <div class="justify-center align-center ">
-        <v-btn color="primary" @click.stop="drawer = !drawer">
-          Toggle
-        </v-btn>
-      </div>
     </v-main>
   </v-layout>
 </template>
+
+<style scoped>
+  .bg-fifth {
+    background-color: #f5f5f5;
+  }
+  .contact-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+    height: 100%;
+}
+</style>
