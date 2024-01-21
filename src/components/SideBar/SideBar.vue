@@ -4,15 +4,22 @@ import MyButton from './MyButton.vue';
 import axios from 'axios';
 import { ref, onMounted, onUnmounted , defineEmits  } from 'vue';
 
-const overlay = ref(false);
 
 const groupData = ref([]);
 const groupNames = ref([]);
 const selectedGroup = ref([]);
 
-const emits = defineEmits();
+const selectOption = (groupUsers) => {
+    emits("selectOption", groupUsers);
+}
+
+// Define an emit function to emit userGroup based on the group clicked
+const emits = defineEmits(['selectedGroup']);
+
+// Handle group click
 
 const handleGroupClick = async(group) => {
+    console.log(group);
     try {
     const response = await axios.get(`http://127.0.0.1:8000/contact/group/${group}`);
     selectedGroup.value = response.data;
@@ -21,9 +28,7 @@ const handleGroupClick = async(group) => {
     console.error('Error fetching data:', error);
   }
 
-    // console.log(selectedGroup.value);
-    // Emit a custom event to notify the parent component
-    emits('groupClicked', selectedGroup);
+    emits('selectedGroup', selectedGroup);
   };
 
 const openGithubRepo = () => {

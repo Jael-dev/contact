@@ -4,6 +4,7 @@ import { ref , watch, defineProps, onMounted} from 'vue';
 import axios from 'axios';
 import SingleContactViewVue from './SingleContactView.vue';
 const drawer = ref(false);
+// const { propsColor, n } =  defineProps(['isWithColor', 'n']); Here we define the props to emit
 const  props  = defineProps(['selectedGroup', 'groupUsers']);
 const filteredGroupUsers = ref([]);
 

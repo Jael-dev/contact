@@ -1,26 +1,34 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useField, useForm } from 'vee-validate';
 import axios from 'axios';
 const { handleSubmit, handleReset } = useForm({
-    // your validationSchema
 });
+
+const groupData = ref([]);
+const groupNames = ref([]);
+
+const fetchData = async () => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/group');
+        groupData.value = response.data;
+
+        groupNames.value = groupData.value.map(group => group.name);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+// Fetch data when the component is mounted
+onMounted(fetchData);
 
 const profile = useField('profile');
 const firstName = useField('firstName');
 const lastName = useField('lastName');
 const phoneNumber = useField('phoneNumber');
 const email = useField('email');
-const birthdate = useField('birthdate');
 const group = useField('group');
 const isFavourite = useField('isFavourite');
-
-const groups = ref([
-    'Group A',
-    'Group B',
-    'Group C',
-    'Group D',
-]);
 
 const isClicked = ref(false);
 
@@ -33,6 +41,7 @@ const addAdditionalField = () => {
     additionalFields.value.push({ key: '', value: '' });
 };
 
+
 const submit = handleSubmit(async values => {
     const contactObject = {
         "photo": values.profile,
@@ -40,7 +49,6 @@ const submit = handleSubmit(async values => {
         "lastName": values.lastName,
         "phoneNumber": values.phoneNumber,
         "email": values.email,
-        "birthdate": values.birthdate,
         "group": values.group,
         "isFavorite": false,
         "groupId": null,
@@ -52,28 +60,38 @@ const submit = handleSubmit(async values => {
         value: field.value,
     }));
 
+    // upload avatar image using http://localhost:3000
+    // const formData = new FormData();
+    // formData.append('file', values.profile);
+    // formData.append('upload_preset', 'contact-app');
+
+    // const response = await axios.post('https://localhost:3000/upload', formData);
+
+    // photo = response.data.secure_url;
+
+
     try {
-    const response = await axios.post('http://127.0.0.1:8000/contact/', {
-        "photo": null,
-        "firstName": firstName,
-        "lastName": lastName,
-        "phoneNumber": phoneNumber,
-        "email": email,
-        "birthdate": "2021-10-12",
-        "group": 1,
-        "isFavorite": false,
-        "groupId": null,
-        "additionalFields": [],
-    });
+        const response = await axios.post('http://127.0.0.1:8000/contact/', {
+            "photo": null,
+            "firstName": values.firstName,
+            "lastName": values.lastName,
+            "phoneNumber": values.phoneNumber,
+            "email": values.email,
+            "birthdate": "2021-10-12",
+            "group": 1,
+            "isFavorite": false,
+            "groupId": null,
+            "additionalFields": [],
+        });
 
-    // Handle the response
-    console.log('Response:', response.data);
+        // Handle the response
+        console.log('Response:', response.data);
 
-    // You can also perform further actions based on the response
-  } catch (error) {
-    // Handle errors
-    console.error('Error:', error.message);
-  }
+        // You can also perform further actions based on the response
+    } catch (error) {
+        // Handle errors
+        console.error('Error:', error.message);
+    }
 
     console.log('Contact Object:', contactObject);
     console.log('Additional Objects:', additionalObjects);
@@ -108,7 +126,7 @@ const submit = handleSubmit(async values => {
                 <v-text-field v-model="email.value.value" :error-messages="email.errorMessage.value"
                     label="E-mail"></v-text-field>
 
-                <v-select v-model="group.value.value" :items="groups" :error-messages="group.errorMessage.value"
+                <v-select v-model="group.value.value" :items="groupNames" :error-messages="group.errorMessage.value"
                     label="Group"></v-select>
 
                 <v-checkbox v-model="isFavourite.value.value" :error-messages="isFavourite.errorMessage.value" value="1"
@@ -120,11 +138,6 @@ const submit = handleSubmit(async values => {
                 <v-text-field v-model="field.key" :label="'Key ' + (index + 1)"></v-text-field>
                 <v-text-field v-model="field.value" :label="'Value ' + (index + 1)"></v-text-field>
             </div>
-
-            <!-- Date Picker -->
-            <v-text-field v-model="birthdate.value.value" :error-messages="birthdate.errorMessage.value" label="Birthdate">
-                <v-date-picker v-model="birthdate.value.value" scrollable></v-date-picker>
-            </v-text-field>
 
             <v-btn class="me-4" type="submit">
                 Submit
